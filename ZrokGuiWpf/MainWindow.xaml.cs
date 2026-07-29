@@ -323,6 +323,73 @@ namespace ZrokGuiWpf
         }
         #endregion
 
+        #region Help Guides
+        private void ShowHelp(string title, string content)
+        {
+            txtHelpTitle.Text = title;
+            txtHelpContent.Text = content;
+            RootDialog.IsOpen = true;
+        }
+
+        private void BtnHelpPublic_Click(object sender, RoutedEventArgs e)
+        {
+            ShowHelp("Public Share Guide", 
+                "The Public Share feature exposes a local service (like a local web server) to the internet securely.\n\n" +
+                "🎯 Target Endpoint:\n" +
+                "Enter the local port or address (e.g., '8080' or 'localhost:3000') that you want to share.\n\n" +
+                "⚙️ Backend Mode:\n" +
+                "• proxy: Forwards traffic to a local web server.\n" +
+                "• web: Serves local files directly via HTTP.\n\n" +
+                "🔐 Basic Auth:\n" +
+                "Enable this to require a username and password to access the public link.");
+        }
+
+        private void BtnHelpPrivate_Click(object sender, RoutedEventArgs e)
+        {
+            ShowHelp("Private Share Guide", 
+                "Private Share creates an encrypted, private tunnel that is NOT accessible publicly on the internet. " +
+                "Only users with the specific zrok token can access it.\n\n" +
+                "🎯 Target Endpoint:\n" +
+                "Enter the local resource (e.g., '8080' or a database port).\n\n" +
+                "⚙️ Backend Mode:\n" +
+                "Select proxy for web servers, tcpTunnel for databases (like SQL or Redis), or udpTunnel for streaming/gaming.");
+        }
+
+        private void BtnHelpFile_Click(object sender, RoutedEventArgs e)
+        {
+            ShowHelp("File Server Guide", 
+                "Quickly turn any local folder on your computer into a shared drive over the network.\n\n" +
+                "📁 Folder Path:\n" +
+                "Browse and select the local directory you want to share.\n\n" +
+                "🌐 Network Type:\n" +
+                "• Public: Anyone with the link can access the files.\n" +
+                "• Private: Only authorized zrok users can access it.\n\n" +
+                "⚙️ Backend Mode:\n" +
+                "• web: Provides a simple web interface to browse and download files.\n" +
+                "• drive: Allows mounting the share as a network drive (requires zrok drive).");
+        }
+
+        private void BtnHelpReserve_Click(object sender, RoutedEventArgs e)
+        {
+            ShowHelp("Reserved Shares Guide", 
+                "Reserved Shares allow you to create permanent, static endpoints that do not change across restarts.\n\n" +
+                "📌 Create Reserve:\n" +
+                "Enter your target, choose public or private, and create. You will receive a permanent 'Token'.\n\n" +
+                "▶️ Start Selected:\n" +
+                "Instead of creating a new temporary share, select a token from the list and start it. Your share will resume on the exact same URL as before.");
+        }
+
+        private void BtnHelpSettings_Click(object sender, RoutedEventArgs e)
+        {
+            ShowHelp("Settings & Status Guide", 
+                "Manage your zrok account and environment.\n\n" +
+                "🔑 Enable Account:\n" +
+                "Paste your secret zrok enable token (from the zrok web console) to authenticate this device.\n\n" +
+                "🔍 Check Network Status:\n" +
+                "Verifies that zrok is installed correctly and checks the current account and environment details.");
+        }
+        #endregion
+
         #region Process Management
         private void LoadReservedSharesFromJson()
         {

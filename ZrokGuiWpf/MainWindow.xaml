@@ -62,6 +62,21 @@
     </Window.Resources>
 
     <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="12" BorderThickness="1" BorderBrush="#E0E0E0">
+        <materialDesign:DialogHost x:Name="RootDialog" DialogTheme="Inherit">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid Width="450" Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="txtHelpTitle" Style="{StaticResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,0,0,16"/>
+                    <ScrollViewer Grid.Row="1" MaxHeight="400" VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="txtHelpContent" TextWrapping="Wrap" FontSize="15" Opacity="0.85" LineHeight="24"/>
+                    </ScrollViewer>
+                    <Button Grid.Row="2" Content="GOT IT" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" HorizontalAlignment="Right" Margin="0,24,0,0"/>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
         <!-- Overall layout: Top Header, Left Sidebar, Right Content -->
         <Grid>
         <Grid.RowDefinitions>
@@ -173,7 +188,12 @@
                         <!-- Control Card -->
                         <materialDesign:Card Padding="{StaticResource CardPadding}" UniformCornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="Public Web Share" Style="{StaticResource TitleText}"/>
+                                <Grid>
+                                    <TextBlock Text="Public Web Share" Style="{StaticResource TitleText}"/>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnHelpPublic_Click" Style="{StaticResource MaterialDesignIconButton}" Width="32" Height="32" Margin="0,-4,0,0" ToolTip="Help &amp; Guide">
+                                        <materialDesign:PackIcon Kind="HelpCircleOutline" Width="24" Height="24" Opacity="0.6"/>
+                                    </Button>
+                                </Grid>
                                 
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -245,7 +265,12 @@
                         <!-- Control Card -->
                         <materialDesign:Card Padding="{StaticResource CardPadding}" UniformCornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="Private Encrypted Share" Style="{StaticResource TitleText}"/>
+                                <Grid>
+                                    <TextBlock Text="Private Encrypted Share" Style="{StaticResource TitleText}"/>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnHelpPrivate_Click" Style="{StaticResource MaterialDesignIconButton}" Width="32" Height="32" Margin="0,-4,0,0" ToolTip="Help &amp; Guide">
+                                        <materialDesign:PackIcon Kind="HelpCircleOutline" Width="24" Height="24" Opacity="0.6"/>
+                                    </Button>
+                                </Grid>
                                 
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -298,7 +323,12 @@
                         <!-- Control Card -->
                         <materialDesign:Card Padding="{StaticResource CardPadding}" UniformCornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="Local Directory Sharing" Style="{StaticResource TitleText}"/>
+                                <Grid>
+                                    <TextBlock Text="Local Directory Sharing" Style="{StaticResource TitleText}"/>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnHelpFile_Click" Style="{StaticResource MaterialDesignIconButton}" Width="32" Height="32" Margin="0,-4,0,0" ToolTip="Help &amp; Guide">
+                                        <materialDesign:PackIcon Kind="HelpCircleOutline" Width="24" Height="24" Opacity="0.6"/>
+                                    </Button>
+                                </Grid>
                                 
                                 <Grid Margin="0,0,0,16">
                                     <Grid.ColumnDefinitions>
@@ -364,7 +394,12 @@
                         <!-- Control Card -->
                         <materialDesign:Card Padding="{StaticResource CardPadding}" UniformCornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="Reserve &amp; Manage Static Endpoints" Style="{StaticResource TitleText}"/>
+                                <Grid>
+                                    <TextBlock Text="Reserve &amp; Manage Static Endpoints" Style="{StaticResource TitleText}"/>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnHelpReserve_Click" Style="{StaticResource MaterialDesignIconButton}" Width="32" Height="32" Margin="0,-4,0,0" ToolTip="Help &amp; Guide">
+                                        <materialDesign:PackIcon Kind="HelpCircleOutline" Width="24" Height="24" Opacity="0.6"/>
+                                    </Button>
+                                </Grid>
                                 
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -447,7 +482,12 @@
                         <!-- Control Card -->
                         <materialDesign:Card Padding="{StaticResource CardPadding}" UniformCornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="Environment Status" Style="{StaticResource TitleText}"/>
+                                <Grid>
+                                    <TextBlock Text="Environment Status" Style="{StaticResource TitleText}"/>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnHelpSettings_Click" Style="{StaticResource MaterialDesignIconButton}" Width="32" Height="32" Margin="0,-4,0,0" ToolTip="Help &amp; Guide">
+                                        <materialDesign:PackIcon Kind="HelpCircleOutline" Width="24" Height="24" Opacity="0.6"/>
+                                    </Button>
+                                </Grid>
                                 
                                 <Grid Margin="0,0,0,24">
                                     <Grid.ColumnDefinitions>
@@ -477,5 +517,6 @@
             </TabControl>
             </Grid>
         </Grid>
+        </materialDesign:DialogHost>
     </Border>
 </Window>
