@@ -11,6 +11,7 @@
         TextOptions.TextRenderingMode="Auto"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Closing="Window_Closing"
+        Loaded="Window_Loaded"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent">
@@ -64,17 +65,48 @@
     <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="12" BorderThickness="1" BorderBrush="#E0E0E0">
         <materialDesign:DialogHost x:Name="RootDialog" DialogTheme="Inherit">
             <materialDesign:DialogHost.DialogContent>
-                <Grid Width="450" Margin="24">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock x:Name="txtHelpTitle" Style="{StaticResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,0,0,16"/>
-                    <ScrollViewer Grid.Row="1" MaxHeight="400" VerticalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="txtHelpContent" TextWrapping="Wrap" FontSize="15" Opacity="0.85" LineHeight="24"/>
-                    </ScrollViewer>
-                    <Button Grid.Row="2" Content="GOT IT" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" HorizontalAlignment="Right" Margin="0,24,0,0"/>
+                <Grid>
+                    <!-- HELP DIALOG -->
+                    <Grid x:Name="HelpDialogContainer" Width="450" Margin="24" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="txtHelpTitle" Style="{StaticResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" Margin="0,0,0,16"/>
+                        <ScrollViewer Grid.Row="1" MaxHeight="400" VerticalScrollBarVisibility="Auto">
+                            <TextBlock x:Name="txtHelpContent" TextWrapping="Wrap" FontSize="15" Opacity="0.85" LineHeight="24"/>
+                        </ScrollViewer>
+                        <Button Grid.Row="2" Content="GOT IT" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" HorizontalAlignment="Right" Margin="0,24,0,0"/>
+                    </Grid>
+
+                    <!-- ZROK MISSING DIALOG -->
+                    <Grid x:Name="ZrokMissingDialogContainer" Width="450" Margin="24" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <materialDesign:PackIcon Kind="AlertCircleOutline" Foreground="#E53935" Width="32" Height="32" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Zrok is Not Installed!" Style="{StaticResource MaterialDesignHeadline5TextBlock}" FontWeight="Bold" VerticalAlignment="Center" Foreground="#E53935"/>
+                        </StackPanel>
+                        
+                        <TextBlock Grid.Row="1" TextWrapping="Wrap" FontSize="15" Opacity="0.85" LineHeight="24">
+                            <Run Text="ZrokGui is a graphical interface for the "/>
+                            <Run FontWeight="Bold" Text="zrok"/>
+                            <Run Text=" engine, but 'zrok.exe' was not found on your system."/>
+                            <LineBreak/><LineBreak/>
+                            <Run Text="Please download the latest release of zrok, extract it, and either add it to your system PATH or simply place "/>
+                            <Run FontWeight="SemiBold" Text="'zrok.exe'"/>
+                            <Run Text=" in the same folder as this application."/>
+                        </TextBlock>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                            <Button Content="DOWNLOAD ZROK" Click="BtnDownloadZrok_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,8,0"/>
+                            <Button Content="I FIXED IT (RETRY)" Click="BtnRetryZrok_Click" Style="{StaticResource MaterialDesignRaisedButton}"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </materialDesign:DialogHost.DialogContent>
         <!-- Overall layout: Top Header, Left Sidebar, Right Content -->

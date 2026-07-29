@@ -21,8 +21,12 @@ namespace ZrokGuiWpf
         public MainWindow()
         {
             InitializeComponent();
-            CheckZrokInstallation();
             LoadReservedSharesFromJson();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            CheckZrokInstallation();
         }
 
         #region Window Controls
@@ -35,6 +39,17 @@ namespace ZrokGuiWpf
         private void BtnMinimize_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
+        }
+
+        private void BtnDownloadZrok_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://zrok.io/download") { UseShellExecute = true });
+        }
+
+        private void BtnRetryZrok_Click(object sender, RoutedEventArgs e)
+        {
+            RootDialog.IsOpen = false;
+            CheckZrokInstallation();
         }
 
         private void BtnMaximize_Click(object sender, RoutedEventArgs e)
@@ -326,6 +341,8 @@ namespace ZrokGuiWpf
         #region Help Guides
         private void ShowHelp(string title, string content)
         {
+            ZrokMissingDialogContainer.Visibility = Visibility.Collapsed;
+            HelpDialogContainer.Visibility = Visibility.Visible;
             txtHelpTitle.Text = title;
             txtHelpContent.Text = content;
             RootDialog.IsOpen = true;
@@ -614,12 +631,9 @@ namespace ZrokGuiWpf
             }
             catch
             {
-                MessageBox.Show(
-                    "zrok.exe not found in PATH. Please set the correct path in Settings tab or install it.",
-                    "Warning",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning
-                );
+                HelpDialogContainer.Visibility = Visibility.Collapsed;
+                ZrokMissingDialogContainer.Visibility = Visibility.Visible;
+                RootDialog.IsOpen = true;
             }
         }
 
