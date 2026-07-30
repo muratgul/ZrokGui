@@ -8,6 +8,9 @@ It allows you to create, start, stop, reserve, and manage **public, private, fil
 ## 🚀 Features
 
 - 🎨 **Modern UI**: Completely overhauled borderless window design using Material Design 3.
+- 💡 **Interactive Help Guides**: Built-in, bilingual (English & Turkish) help dialogs for every feature.
+- 🩺 **Smart Installation Detection**: Visually detects if `zrok` is missing and provides an easy 1-click download menu.
+- 🟢 **Real-Time Status Badge**: A live badge in the title bar tracking your zrok installation and its version.
 - ✅ **Public & Private sharing**: Expose endpoints securely.
 - 📁 **Folder sharing**: Serve local directories over public or private networks.
 - 🔐 **Basic Authentication**: Add instant security to public shares.
