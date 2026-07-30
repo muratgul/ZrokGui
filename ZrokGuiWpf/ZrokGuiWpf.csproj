@@ -14,4 +14,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="zrok.ico" />
+    <Resource Include="zrok.ico" />
+  </ItemGroup>
+
 </Project>
