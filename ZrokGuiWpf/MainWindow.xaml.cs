@@ -627,13 +627,33 @@ namespace ZrokGuiWpf
                     }
                 };
                 process.Start();
+                string output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
+
+                string version = "Unknown";
+                var match = Regex.Match(output, @"v\d+\.\d+\.\d+");
+                if (match.Success)
+                {
+                    version = match.Value;
+                }
+
+                Dispatcher.Invoke(() => {
+                    txtZrokStatus.Text = $"Zrok {version} Ready";
+                    ZrokStatusBadge.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#4CAF50");
+                    ZrokStatusIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.CheckCircleOutline;
+                });
             }
             catch
             {
-                HelpDialogContainer.Visibility = Visibility.Collapsed;
-                ZrokMissingDialogContainer.Visibility = Visibility.Visible;
-                RootDialog.IsOpen = true;
+                Dispatcher.Invoke(() => {
+                    txtZrokStatus.Text = "Zrok Missing!";
+                    ZrokStatusBadge.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#E53935");
+                    ZrokStatusIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.AlertCircleOutline;
+
+                    HelpDialogContainer.Visibility = Visibility.Collapsed;
+                    ZrokMissingDialogContainer.Visibility = Visibility.Visible;
+                    RootDialog.IsOpen = true;
+                });
             }
         }
 
