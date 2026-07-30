@@ -14,7 +14,8 @@
         Loaded="Window_Loaded"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="Transparent">
+        Background="Transparent"
+        Icon="zrok.ico">
     <Window.Resources>
         <!-- Spacing and standard margins -->
         <Thickness x:Key="StandardMargin">0,0,0,16</Thickness>
