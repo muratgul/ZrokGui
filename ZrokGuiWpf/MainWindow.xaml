@@ -104,8 +104,10 @@
                         </TextBlock>
 
                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                            <Button Content="EXIT APP" Click="BtnClose_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="#E53935" Margin="0,0,8,0"/>
+                            <Button Content="CLOSE" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" Style="{StaticResource MaterialDesignFlatButton}" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,8,0"/>
                             <Button Content="DOWNLOAD ZROK" Click="BtnDownloadZrok_Click" Style="{StaticResource MaterialDesignFlatButton}" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,8,0"/>
-                            <Button Content="I FIXED IT (RETRY)" Click="BtnRetryZrok_Click" Style="{StaticResource MaterialDesignRaisedButton}"/>
+                            <Button Content="RETRY" Click="BtnRetryZrok_Click" Style="{StaticResource MaterialDesignRaisedButton}"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
