@@ -15,13 +15,36 @@ namespace ZrokGuiWpf
     public partial class MainWindow : Window
     {
         private Process? currentProcess;
-        private readonly string zrokExecutablePath = "zrok.exe";
+        private string zrokExecutablePath = "zrok.exe";
         private readonly string reserveJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reserved_shares.json");
 
         public MainWindow()
         {
             InitializeComponent();
+            FindZrokExecutable();
             LoadReservedSharesFromJson();
+        }
+
+        private void FindZrokExecutable()
+        {
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var possibleNames = new[] { "zrok.exe", "zrok2.exe" };
+            
+            foreach (var name in possibleNames)
+            {
+                if (File.Exists(Path.Combine(baseDir, name)))
+                {
+                    zrokExecutablePath = name;
+                    return;
+                }
+            }
+            
+            // Eğer tam adıyla bulamazsa, içinde zrok geçen ilk exe'yi al
+            var files = Directory.GetFiles(baseDir, "zrok*.exe");
+            if (files.Length > 0)
+            {
+                zrokExecutablePath = Path.GetFileName(files[0]);
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
