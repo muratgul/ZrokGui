@@ -26,10 +26,12 @@ It allows you to create, start, stop, reserve, and manage **public, private, fil
 ## 🧰 Requirements
 
 - **Windows 10 / 11**
-- **.NET 10.0 (WPF)**
-- **zrok installed and accessible in PATH**
+- **.NET 10.0** (if not using the self-contained release)
+- **zrok executable**
 
-Verify your zrok installation via command line:
-```bash
-zrok version
-```
+### ⚙️ How to setup Zrok with this GUI:
+`zrok` is a portable command-line tool. You don't need to formally install it or add it to your system PATH!
+1. Download the Windows version of `zrok` from the [official website](https://netfoundry.io/docs/zrok/how-tos/install/).
+2. Extract the `.exe` file (it might be named `zrok.exe` or `zrok2.exe`).
+3. Place that executable directly inside the **same folder** as `ZrokGuiWpf.exe`.
+4. Our application will automatically discover it (even if it's named `zrok2.exe` or similar) and use it silently in the background!
