@@ -25,7 +25,6 @@ namespace ZrokGuiWpf
             FindZrokExecutable();
             LoadReservedSharesFromJson();
         }
-
         private void FindZrokExecutable()
         {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
