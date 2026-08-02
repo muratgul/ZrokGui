@@ -17,6 +17,7 @@ namespace ZrokGuiWpf
         private Process? currentProcess;
         private string zrokExecutablePath = "zrok.exe";
         private readonly string reserveJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reserved_shares.json");
+        private readonly string settingsJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
         public MainWindow()
         {
@@ -49,6 +50,35 @@ namespace ZrokGuiWpf
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             CheckZrokInstallation();
+            LoadSettings();
+        }
+
+        private void LoadSettings()
+        {
+            if (File.Exists(settingsJsonPath))
+            {
+                try
+                {
+                    var json = File.ReadAllText(settingsJsonPath);
+                    var settings = JsonConvert.DeserializeObject<dynamic>(json);
+                    if (settings != null && settings.EnableToken != null)
+                    {
+                        txtEnableToken.Text = settings.EnableToken;
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private void SaveEnableToken(string token)
+        {
+            try
+            {
+                var settings = new { EnableToken = token };
+                var json = JsonConvert.SerializeObject(settings, Formatting.Indented);
+                File.WriteAllText(settingsJsonPath, json);
+            }
+            catch { }
         }
 
         #region Window Controls
@@ -202,6 +232,8 @@ namespace ZrokGuiWpf
             txtStatusOutput.AppendText("Enabling account...\n");
 
             await RunZrokCommandSync($"enable {txtEnableToken.Text}", txtStatusOutput);
+
+            SaveEnableToken(txtEnableToken.Text);
 
             btnEnable.IsEnabled = true;
             MessageBox.Show("Account enabled! Check status to verify.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
