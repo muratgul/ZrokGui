@@ -43,7 +43,7 @@ namespace ZrokGuiWpf
 
         private void BtnDownloadZrok_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(new ProcessStartInfo("https://zrok.io/download") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo("https://netfoundry.io/docs/zrok/how-tos/install/") { UseShellExecute = true });
         }
 
         private void BtnRetryZrok_Click(object sender, RoutedEventArgs e)
