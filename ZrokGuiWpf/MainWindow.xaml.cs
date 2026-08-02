@@ -14,7 +14,7 @@ namespace ZrokGuiWpf
 {
     public partial class MainWindow : Window
     {
-        private Process? currentProcess;
+        private Dictionary<Button, (Process Process, Button BtnStart)> activeProcesses = new Dictionary<Button, (Process Process, Button BtnStart)>();
         private string zrokExecutablePath = "zrok.exe";
         private readonly string reserveJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reserved_shares.json");
         private readonly string settingsJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
@@ -126,6 +126,13 @@ namespace ZrokGuiWpf
             txtPublicPassword.IsEnabled = isChecked;
         }
 
+        private void ChkPrivateOpen_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (txtPrivateAccessGrants == null) return;
+            bool isChecked = chkPrivateOpen.IsChecked ?? false;
+            txtPrivateAccessGrants.IsEnabled = !isChecked;
+        }
+
         private async void BtnPublicShare_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtPublicTarget.Text))
@@ -150,7 +157,7 @@ namespace ZrokGuiWpf
             btnPublicStop.IsEnabled = true;
             txtPublicOutput.Clear();
 
-            await RunZrokCommand(arguments, txtPublicOutput);
+            await RunZrokCommand(arguments, txtPublicOutput, btnPublicShare, btnPublicStop);
         }
 
         private async void BtnPrivateShare_Click(object sender, RoutedEventArgs e)
@@ -168,11 +175,24 @@ namespace ZrokGuiWpf
                 arguments += $" --backend-mode {cbi.Content}";
             }
 
+            if (chkPrivateOpen.IsChecked == true)
+            {
+                arguments += " --open";
+            }
+            else if (!string.IsNullOrWhiteSpace(txtPrivateAccessGrants.Text))
+            {
+                var grants = txtPrivateAccessGrants.Text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var grant in grants)
+                {
+                    arguments += $" --access-grant {grant.Trim()}";
+                }
+            }
+
             btnPrivateShare.IsEnabled = false;
             btnPrivateStop.IsEnabled = true;
             txtPrivateOutput.Clear();
 
-            await RunZrokCommand(arguments, txtPrivateOutput);
+            await RunZrokCommand(arguments, txtPrivateOutput, btnPrivateShare, btnPrivateStop);
         }
 
         private void BtnBrowseFolder_Click(object sender, RoutedEventArgs e)
@@ -203,7 +223,7 @@ namespace ZrokGuiWpf
             btnFileStop.IsEnabled = true;
             txtFileOutput.Clear();
 
-            await RunZrokCommand(arguments, txtFileOutput);
+            await RunZrokCommand(arguments, txtFileOutput, btnFileShare, btnFileStop);
         }
 
         private async void BtnStatus_Click(object sender, RoutedEventArgs e)
@@ -240,25 +260,29 @@ namespace ZrokGuiWpf
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            if (currentProcess != null && !currentProcess.HasExited)
+            if (sender is Button btnStop && activeProcesses.ContainsKey(btnStop))
             {
-                try
+                var pInfo = activeProcesses[btnStop];
+                if (!pInfo.Process.HasExited)
                 {
-                    currentProcess.Kill(true);
+                    try { pInfo.Process.Kill(true); } catch { }
                 }
-                catch { }
-                currentProcess = null;
-                EnableButtons();
+                activeProcesses.Remove(btnStop);
+                
+                pInfo.BtnStart.IsEnabled = true;
+                btnStop.IsEnabled = false;
+                
                 MessageBox.Show("Share stopped.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (currentProcess != null && !currentProcess.HasExited)
+            var runningProcesses = activeProcesses.Values.Where(p => !p.Process.HasExited).ToList();
+            if (runningProcesses.Any())
             {
                 var result = MessageBox.Show(
-                    "There is an active share. Do you want to stop it and exit?",
+                    $"There are {runningProcesses.Count} active shares. Do you want to stop them and exit?",
                     "Confirm Exit",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question
@@ -266,7 +290,10 @@ namespace ZrokGuiWpf
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    try { currentProcess.Kill(true); } catch { }
+                    foreach (var pInfo in runningProcesses)
+                    {
+                        try { pInfo.Process.Kill(true); } catch { }
+                    }
                 }
                 else
                 {
@@ -293,6 +320,11 @@ namespace ZrokGuiWpf
             }
 
             arguments += $" {txtReserveTarget.Text}";
+
+            if (!string.IsNullOrWhiteSpace(txtReserveUniqueName.Text))
+            {
+                arguments += $" --unique-name {txtReserveUniqueName.Text.Trim()}";
+            }
 
             btnCreateReserve.IsEnabled = false;
             txtReserveOutput.Clear();
@@ -347,7 +379,7 @@ namespace ZrokGuiWpf
             txtReserveOutput.Clear();
             txtReserveOutput.AppendText($"Starting reserved share: {selected.Token}\n");
 
-            await RunZrokCommand(arguments, txtReserveOutput);
+            await RunZrokCommand(arguments, txtReserveOutput, btnStartReserved, btnStopReserved);
         }
 
         private async void BtnDeleteReserve_Click(object sender, RoutedEventArgs e)
@@ -431,14 +463,18 @@ namespace ZrokGuiWpf
                 "🎯 Target Endpoint:\n" +
                 "Enter the local resource (e.g., '8080' or a database port).\n\n" +
                 "⚙️ Backend Mode:\n" +
-                "Select proxy for web servers, tcpTunnel for databases (like SQL or Redis), or udpTunnel for streaming/gaming.\n\n" +
+                "Select proxy for web servers, tcpTunnel/udpTunnel for databases or gaming, or socks for proxying.\n\n" +
+                "🔐 Permissions (Open vs Grants):\n" +
+                "Use 'Open Mode' to allow any authenticated user, or specify comma-separated emails in 'Access Grants' to restrict access.\n\n" +
                 "───────────────────────────\n\n" +
                 "🇹🇷 [TR] Private Share (Özel Paylaşım), internet üzerinden herkese açık OLMAYAN şifreli ve özel bir tünel oluşturur. " +
                 "Sadece özel zrok token'ına (anahtarına) sahip kullanıcılar erişebilir.\n\n" +
                 "🎯 Target Endpoint (Hedef):\n" +
                 "Yerel kaynağı girin (Örn: '8080' veya bir veritabanı portu).\n\n" +
                 "⚙️ Backend Mode (Arka Plan Modu):\n" +
-                "Web sunucuları için proxy'yi, veritabanları (SQL, Redis vb.) için tcpTunnel'ı veya yayın/oyun için udpTunnel'ı seçin.");
+                "Web sunucuları için proxy, veritabanları/oyunlar için tcpTunnel/udpTunnel veya socks seçin.\n\n" +
+                "🔐 İzinler (Open ve Grants):\n" +
+                "Tüm doğrulanmış kullanıcılara açmak için 'Open Mode' kullanın veya sadece belirli kişilere izin vermek için 'Access Grants' kısmına e-posta adreslerini (virgülle ayırarak) yazın.");
         }
 
         private void BtnHelpFile_Click(object sender, RoutedEventArgs e)
@@ -471,14 +507,18 @@ namespace ZrokGuiWpf
                 "🇬🇧 [EN] Reserved Shares allow you to create permanent, static endpoints that do not change across restarts.\n\n" +
                 "📌 Create Reserve:\n" +
                 "Enter your target, choose public or private, and create. You will receive a permanent 'Token'.\n\n" +
+                "🏷️ Unique Name (Optional):\n" +
+                "Assign a custom memorable name to your reserved share instead of a random token.\n\n" +
                 "▶️ Start Selected:\n" +
-                "Instead of creating a new temporary share, select a token from the list and start it. Your share will resume on the exact same URL as before.\n\n" +
+                "Select a token from the list and start it. Your share will resume on the exact same URL as before.\n\n" +
                 "───────────────────────────\n\n" +
                 "🇹🇷 [TR] Reserved Shares (Ayrılmış Paylaşımlar), yeniden başlatmalarda değişmeyen kalıcı ve sabit uç noktalar (URL/Token) oluşturmanızı sağlar.\n\n" +
                 "📌 Create Reserve (Rezervasyon Oluştur):\n" +
-                "Hedefinizi girin, public (genel) veya private (özel) seçin ve oluşturun. Size kalıcı bir 'Token' verilecektir.\n\n" +
+                "Hedefinizi girin, public veya private seçin ve oluşturun. Size kalıcı bir 'Token' verilecektir.\n\n" +
+                "🏷️ Unique Name (Özel İsim - İsteğe Bağlı):\n" +
+                "Rastgele bir token yerine, paylaşımınıza akılda kalıcı özel bir isim atamanızı sağlar.\n\n" +
                 "▶️ Start Selected (Seçileni Başlat):\n" +
-                "Yeni geçici bir paylaşım oluşturmak yerine, listeden bir token seçip başlatın. Paylaşımınız daha öncekiyle tamamen aynı URL/Token üzerinden devam edecektir.");
+                "Listeden bir token seçip başlatın. Paylaşımınız daha öncekiyle tamamen aynı URL/Token üzerinden devam edecektir.");
         }
 
         private void BtnHelpSettings_Click(object sender, RoutedEventArgs e)
@@ -555,16 +595,21 @@ namespace ZrokGuiWpf
             );
         }
 
-        private async Task RunZrokCommand(string arguments, TextBox outputBox)
+        private async Task RunZrokCommand(string arguments, TextBox outputBox, Button btnStart, Button btnStop)
         {
             try
             {
-                if (currentProcess != null && !currentProcess.HasExited)
+                if (activeProcesses.ContainsKey(btnStop))
                 {
-                    currentProcess.Kill(true);
+                    var oldProcess = activeProcesses[btnStop].Process;
+                    if (!oldProcess.HasExited)
+                    {
+                        try { oldProcess.Kill(true); } catch { }
+                    }
+                    activeProcesses.Remove(btnStop);
                 }
 
-                currentProcess = new Process
+                var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -580,26 +625,40 @@ namespace ZrokGuiWpf
                     EnableRaisingEvents = true,
                 };
 
-                currentProcess.OutputDataReceived += (s, e) => {
+                activeProcesses[btnStop] = (process, btnStart);
+
+                process.OutputDataReceived += (s, e) => {
                     if (e.Data != null) AppendToOutput(outputBox, e.Data);
                 };
 
-                currentProcess.ErrorDataReceived += (s, e) => {
+                process.ErrorDataReceived += (s, e) => {
                     if (e.Data != null) AppendToOutput(outputBox, "[ERROR] " + e.Data);
                 };
 
-                currentProcess.Start();
-                currentProcess.BeginOutputReadLine();
-                currentProcess.BeginErrorReadLine();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
 
-                await currentProcess.WaitForExitAsync();
+                await process.WaitForExitAsync();
 
-                Dispatcher.Invoke(() => EnableButtons());
+                Dispatcher.Invoke(() => 
+                {
+                    btnStart.IsEnabled = true;
+                    btnStop.IsEnabled = false;
+                    if (activeProcesses.ContainsKey(btnStop))
+                    {
+                        activeProcesses.Remove(btnStop);
+                    }
+                });
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error running zrok: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Dispatcher.Invoke(() => EnableButtons());
+                Dispatcher.Invoke(() => 
+                {
+                    btnStart.IsEnabled = true;
+                    btnStop.IsEnabled = false;
+                });
             }
         }
 
@@ -652,17 +711,7 @@ namespace ZrokGuiWpf
             }
         }
 
-        private void EnableButtons()
-        {
-            btnPublicShare.IsEnabled = true;
-            btnPublicStop.IsEnabled = false;
-            btnPrivateShare.IsEnabled = true;
-            btnPrivateStop.IsEnabled = false;
-            btnFileShare.IsEnabled = true;
-            btnFileStop.IsEnabled = false;
-            btnStartReserved.IsEnabled = true;
-            btnStopReserved.IsEnabled = false;
-        }
+
 
         private void CheckZrokInstallation()
         {

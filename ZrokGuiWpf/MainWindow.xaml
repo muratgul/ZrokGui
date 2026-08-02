@@ -15,7 +15,11 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
+        ResizeMode="CanResize"
         Icon="pack://application:,,,/zrok.ico">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="8" GlassFrameThickness="0" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
     <Window.Resources>
         <!-- Spacing and standard margins -->
         <Thickness x:Key="StandardMargin">0,0,0,16</Thickness>
@@ -333,6 +337,25 @@
                                     </ComboBox>
                                 </Grid>
 
+                                <Separator Margin="0,8,0,24" Background="#E0E0E0"/>
+
+                                <TextBlock Text="Permission Settings" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,16" Opacity="0.7"/>
+                                
+                                <Grid Margin="0,0,0,16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                                        <TextBlock Text="Open Mode" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="Medium"/>
+                                        <ToggleButton x:Name="chkPrivateOpen" Checked="ChkPrivateOpen_CheckedChanged" Unchecked="ChkPrivateOpen_CheckedChanged" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                                    </StackPanel>
+
+                                    <TextBox x:Name="txtPrivateAccessGrants" Grid.Column="2" materialDesign:HintAssist.Hint="Access Grants (comma separated emails)" Margin="0"/>
+                                </Grid>
+
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                                     <Button x:Name="btnPrivateStop" Content="STOP SHARING" Style="{StaticResource StopButton}" IsEnabled="False" Click="BtnStop_Click" Margin="0,0,12,0"/>
                                     <Button x:Name="btnPrivateShare" Content="START SHARE" Click="BtnPrivateShare_Click" Width="160" Background="#FF547788" Foreground="White" BorderBrush="{x:Null}"/>
@@ -467,6 +490,10 @@
                                     </ComboBox>
                                     
                                     <Button x:Name="btnCreateReserve" Grid.Column="6" Content="CREATE RESERVE" Click="BtnCreateReserve_Click" Height="48" Width="160" Background="#FF547788" Foreground="White" BorderBrush="{x:Null}"/>
+                                </Grid>
+                                
+                                <Grid Margin="0,16,0,0">
+                                    <TextBox x:Name="txtReserveUniqueName" materialDesign:HintAssist.Hint="Unique Name (Optional)" Margin="0"/>
                                 </Grid>
                             </StackPanel>
                         </materialDesign:Card>

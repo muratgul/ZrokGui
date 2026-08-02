@@ -13,9 +13,10 @@ It allows you to create, start, stop, reserve, and manage **public, private, fil
 - 🟢 **Real-Time Status Badge**: A live badge in the title bar tracking your zrok installation and its version.
 - ✅ **Public & Private sharing**: Expose endpoints securely.
 - 📁 **Folder sharing**: Serve local directories over public or private networks.
-- 🔐 **Basic Authentication**: Add instant security to public shares.
-- 📌 **Reserved Shares**: Create, save, and manage permanent endpoints.
-- ▶ **Start / ⏹ Stop**: Easily toggle active shares with large accessible buttons.
+- 🔐 **Security & Permissions**: Basic Auth for public shares, and **Open Mode / Access Grants** for private shares.
+- 📌 **Reserved Shares**: Create, save, and manage permanent endpoints with custom **Unique Names**.
+- ▶ **Simultaneous Execution**: Start and run multiple zrok shares concurrently in the background without them interfering with each other.
+- 🛠 **Full Backend Support**: proxy, web, caddy, drive, tcpTunnel, udpTunnel, and socks backend modes.
 - 📋 **Auto-Clipboard**: Automatically copies active share URLs to clipboard.
 - 🗂 **Persistent Storage**: Reserved shares are saved locally in JSON.
 - 🖥 **Live Logging**: Real-time zrok console output directly in the app.
