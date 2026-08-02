@@ -681,30 +681,64 @@ namespace ZrokGuiWpf
 
         private void ProcessOutput(TextBox tb, string text)
         {
-            if (text.Contains("\"msg\":") && text.Contains("https://"))
+            string cleanText = text;
+            bool isStdErr = false;
+            
+            if (cleanText.StartsWith("[ERROR] "))
             {
-                try
-                {
-                    var urlMatch = Regex.Match(text, @"https://[a-zA-Z0-9\-\.]+\.share\.zrok\.io");
-                    if (urlMatch.Success)
-                    {
-                        var url = urlMatch.Value;
-                        tb.AppendText("═══════════════════════════════════════" + Environment.NewLine);
-                        tb.AppendText("✓ Share Active!" + Environment.NewLine);
-                        tb.AppendText($"📎 URL: {url}" + Environment.NewLine);
-                        tb.AppendText($"🕐 Time: {DateTime.Now:HH:mm:ss}" + Environment.NewLine);
-                        tb.AppendText("═══════════════════════════════════════" + Environment.NewLine);
+                cleanText = cleanText.Substring(8);
+                isStdErr = true;
+            }
 
-                        Clipboard.SetText(url);
-                        tb.AppendText("✓ URL copied to clipboard!" + Environment.NewLine);
+            try
+            {
+                // Eğer log JSON formatındaysa deserialize edip sadece mesaj kısmını gösterelim
+                if (cleanText.TrimStart().StartsWith("{"))
+                {
+                    var logData = JsonConvert.DeserializeObject<dynamic>(cleanText);
+                    if (logData != null && logData.msg != null)
+                    {
+                        string msg = logData.msg.ToString();
+                        string level = logData.level != null ? logData.level.ToString().ToUpper() : "INFO";
+
+                        // URL kontrolü (https:// olsun veya olmasın, share.zrok.io veya shares.zrok.io yakala)
+                        var match = Regex.Match(msg, @"([a-zA-Z0-9\-\.]+\.share[s]?\.zrok\.io)");
+                        if (match.Success)
+                        {
+                            var url = match.Value;
+                            if (!url.StartsWith("http")) url = "https://" + url.Trim();
+
+                            tb.AppendText("═══════════════════════════════════════" + Environment.NewLine);
+                            tb.AppendText("✓ Share Active!" + Environment.NewLine);
+                            tb.AppendText($"📎 URL: {url}" + Environment.NewLine);
+                            tb.AppendText($"🕐 Time: {DateTime.Now:HH:mm:ss}" + Environment.NewLine);
+                            tb.AppendText("═══════════════════════════════════════" + Environment.NewLine);
+
+                            Clipboard.SetText(url);
+                            tb.AppendText("✓ URL copied to clipboard!" + Environment.NewLine);
+                            tb.ScrollToEnd();
+                            return;
+                        }
+
+                        // Sadece DEBUG olmayan mesajları kullanıcı dostu göster
+                        if (level == "ERROR" || level == "FATAL")
+                        {
+                            tb.AppendText("[ERROR] " + msg + Environment.NewLine);
+                        }
+                        else if (level != "DEBUG")
+                        {
+                            tb.AppendText(msg + Environment.NewLine);
+                        }
+                        
                         tb.ScrollToEnd();
                         return;
                     }
                 }
-                catch { }
             }
+            catch { }
 
-            if (!text.StartsWith("[ERROR]"))
+            // JSON parse edilemediyse eski usul devam et
+            if (!isStdErr)
             {
                 tb.AppendText(text + Environment.NewLine);
             }

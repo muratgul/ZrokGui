@@ -35,3 +35,11 @@ It allows you to create, start, stop, reserve, and manage **public, private, fil
 2. Extract the `.exe` file (it might be named `zrok.exe` or `zrok2.exe`).
 3. Place that executable directly inside the **same folder** as `ZrokGuiWpf.exe`.
 4. Our application will automatically discover it (even if it's named `zrok2.exe` or similar) and use it silently in the background!
+
+### 🔑 Enabling Your Account (Required):
+Before creating any shares, you must authenticate your device:
+1. Go to [myzrok.io](https://myzrok.io/) (or api.zrok.io) and sign up for a free account.
+2. Once logged in, find your **Enable Token** (a secret key used to authenticate your environment).
+3. Open the **Zrok Desktop GUI**, navigate to the **Settings & Status** section (via the left menu).
+4. Paste your token into the **Enable Token** field and click **Enable**.
+5. You are now ready to start sharing!
