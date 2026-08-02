@@ -39,7 +39,6 @@ namespace ZrokGuiWpf
                 }
             }
             
-            // Eğer tam adıyla bulamazsa, içinde zrok geçen ilk exe'yi al
             var files = Directory.GetFiles(baseDir, "zrok*.exe");
             if (files.Length > 0)
             {
